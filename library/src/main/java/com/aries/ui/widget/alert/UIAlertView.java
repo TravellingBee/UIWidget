@@ -37,6 +37,7 @@ import com.aries.ui.widget.R;
 public class UIAlertView {
     private Context context;
     private AlertDialog dialog;
+    private View mRootView;
     private TextView txt_title;
     private TextView txt_msg;
     //addView 父容器
@@ -57,58 +58,45 @@ public class UIAlertView {
     private boolean showNegBtn = false;
     private boolean showNeuBtn = false;
     private boolean setMinWidth = false;
+
+    private float mWindowAlpha = -1.0f;
+    private float mWindowDimAmount = -1.0f;
+
     /**
      * 是否自定义了button样式
      */
     private boolean isCustomButtonStyle = false;
 
     private int gravity = Gravity.CENTER;
-    private Window window;
-    private WindowManager.LayoutParams lp;
 
     public UIAlertView(Context context) {
         this.context = context;
         // 获取Dialog布局
-        View view = LayoutInflater.from(context).inflate(
+        mRootView = LayoutInflater.from(context).inflate(
                 R.layout.layout_alert_view, null);
         // 获取自定义Dialog布局中的控件
-        imageViewDelete = (ImageView) view.findViewById(R.id.iv_deleteAlertView);
+        imageViewDelete = (ImageView) mRootView.findViewById(R.id.iv_deleteAlertView);
         imageViewDelete.setVisibility(View.GONE);
-        txt_title = (TextView) view.findViewById(R.id.tv_titleAlertView);
+        txt_title = (TextView) mRootView.findViewById(R.id.tv_titleAlertView);
         txt_title.setVisibility(View.GONE);
-        txt_msg = (TextView) view.findViewById(R.id.tv_msgAlertView);
+        txt_msg = (TextView) mRootView.findViewById(R.id.tv_msgAlertView);
         txt_msg.setVisibility(View.GONE);
-        dialog_Group = (LinearLayout) view.findViewById(R.id.lLayout_viewAlertView);
+        dialog_Group = (LinearLayout) mRootView.findViewById(R.id.lLayout_viewAlertView);
         dialog_Group.setVisibility(View.GONE);
-        btn_left = (TextView) view.findViewById(R.id.tv_leftAlertView);
+        btn_left = (TextView) mRootView.findViewById(R.id.tv_leftAlertView);
         btn_left.setVisibility(View.GONE);
-        btn_middle = (TextView) view.findViewById(R.id.tv_middleAlertView);
+        btn_middle = (TextView) mRootView.findViewById(R.id.tv_middleAlertView);
         btn_middle.setVisibility(View.GONE);
-        btn_right = (TextView) view.findViewById(R.id.tv_rightAlertView);
+        btn_right = (TextView) mRootView.findViewById(R.id.tv_rightAlertView);
         btn_right.setVisibility(View.GONE);
-        mViewLine = view.findViewById(R.id.v_lineAlertView);
+        mViewLine = mRootView.findViewById(R.id.v_lineAlertView);
         mViewLine.setVisibility(View.GONE);
-        mViewLineHorizontal = view.findViewById(R.id.v_lineHorizontalAlertView);
+        mViewLineHorizontal = mRootView.findViewById(R.id.v_lineHorizontalAlertView);
         mViewLineHorizontal.setVisibility(View.GONE);
-        mViewLineRight = view.findViewById(R.id.v_lineRightAlertView);
+        mViewLineRight = mRootView.findViewById(R.id.v_lineRightAlertView);
         mViewLineRight.setVisibility(View.GONE);
-        linearLayoutGroup = (LinearLayout) view.findViewById(R.id.lLayout_groupAlertView);
-        linearLayoutMain = (LinearLayout) view.findViewById(R.id.lLayout_mainAlertView);
-        // 定义Dialog布局和参数
-        dialog = new AlertDialog.Builder(context, R.style.AlertViewDialogStyle).create();
-        dialog.show();
-        dialog.setContentView(view);
-        window = dialog.getWindow();
-        lp = window.getAttributes();
-        window.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-        dialog.setOnDismissListener(new OnDismissListener() {
-
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                dialog_Group.removeAllViews();
-            }
-        });
-        dialog.dismiss();
+        linearLayoutGroup = (LinearLayout) mRootView.findViewById(R.id.lLayout_groupAlertView);
+        linearLayoutMain = (LinearLayout) mRootView.findViewById(R.id.lLayout_mainAlertView);
     }
 
     public UIAlertView builder() {
@@ -150,8 +138,7 @@ public class UIAlertView {
      * @return
      */
     public UIAlertView setAlpha(float alpha) {
-        lp.alpha = alpha;// 透明度
-        window.setAttributes(lp);
+        mWindowAlpha = alpha;
         return this;
     }
 
@@ -162,8 +149,7 @@ public class UIAlertView {
      * @return
      */
     public UIAlertView setDimAmount(float dimAmount) {
-        lp.dimAmount = dimAmount;// 黑暗度
-        window.setAttributes(lp);
+        mWindowDimAmount = dimAmount;
         return this;
     }
 
@@ -773,9 +759,24 @@ public class UIAlertView {
 
     public UIAlertView show() {
         setLayout();
-        if (!dialog.isShowing()) {
-            dialog.show();
+
+        dialog = new AlertDialog.Builder(context, R.style.AlertViewDialogStyle).create();
+        dialog.show();
+        dialog.setContentView(mRootView);
+
+        Window window = dialog.getWindow();
+        window.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+        WindowManager.LayoutParams lp = window.getAttributes();
+
+        if (mWindowAlpha != -1.0f) {
+            lp.alpha = mWindowAlpha;
         }
+
+        if (mWindowDimAmount != -1.0f) {
+            lp.dimAmount = mWindowDimAmount;
+        }
+
+        window.setAttributes(lp);
         return this;
     }
 
