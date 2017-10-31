@@ -153,12 +153,6 @@ public class UIAlertView {
         return this;
     }
 
-    public UIAlertView setContentView(int layoutResID) {
-        dialog.show();
-        dialog.setContentView(layoutResID);
-        return this;
-    }
-
     public UIAlertView setBackgroundColor(int color) {
         linearLayoutMain.setBackgroundColor(color);
         return this;
